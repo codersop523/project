@@ -1,0 +1,249 @@
+<style>
+    /* Add these styles */
+    .services-container {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        padding-bottom: 20px;
+    }
+    
+    .services-container::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .service-card {
+        flex: 0 0 100%;
+        scroll-snap-align: start;
+        min-width: 100%;
+        transition: transform 0.3s ease;
+    }
+    
+    .tab-options {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+    }
+    
+    .tab {
+        cursor: pointer;
+        padding: 10px 15px;
+        border-radius: 20px;
+        background: #f5f5f5;
+        color: #666;
+        transition: all 0.3s ease;
+    }
+    
+    .tab.active {
+        background: #333;
+        color: white;
+    }
+    
+    .carousel-dots {
+        text-align: center;
+        padding: 20px 0;
+        display: none;
+    }
+    
+    .carousel-dots.active {
+        display: block;
+    }
+    
+    .dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #ddd;
+        margin: 0 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .dot.active {
+        background: #333;
+        transform: scale(1.3);
+    }
+    
+    @media (min-width: 768px) {
+        .services-container {
+            flex-wrap: wrap;
+            overflow-x: visible;
+            justify-content: center;
+        }
+        
+        .service-card {
+            flex: 0 0 calc(33.33% - 20px);
+            min-width: auto;
+        }
+        
+        .carousel-dots {
+            display: none !important;
+        }
+    }
+    
+    /* Tax Section Specific Styles */
+    .tax-container .service-card {
+        background: #f9f9f9;
+        border-left: 4px solid #333;
+    }
+    </style>
+    
+    <section class="services-section">
+        <!-- Tab Navigation -->
+        <div class="services-header">
+            <div class="tab-options">
+                <span class="tab active" data-target="product">By Product / Service</span>
+                <span class="tab" data-target="tax">By Tax Status</span>
+            </div>
+            <h2>Asset Management Solutions</h2>
+        </div>
+    
+        <!-- Product Cards -->
+        <div class="services-container product active">
+            <div class="service-card">
+                <span class="label">Learn</span>
+                <h3>Investment Advisory Services</h3>
+                <p>Our primary goal is to protect your capital over the long term while achieving the best possible return.</p>
+                <a href="#" class="learn-more">Know More &rarr;</a>
+            </div>
+    
+            <div class="service-card">
+                <span class="label">Learn</span>
+                <h3>Portfolio Management Services (PMS)</h3>
+                <p>Shepherd’s Hill PMS is one of the only PMS providers in India that does not charge any client a fixed management fee.</p>
+                <a href="#" class="learn-more">Know More &rarr;</a>
+            </div>
+    
+            <div class="service-card">
+                <span class="label">Learn</span>
+                <h3>Alternative Investment Fund (AIF)</h3>
+                <p>An AIF is a privately pooled investment vehicle which can comprise Indian and foreign investors.</p>
+                <a href="#" class="learn-more">Know More &rarr;</a>
+            </div>
+        </div>
+    
+        <!-- Tax Cards -->
+        <div class="services-container tax">
+            <div class="service-card">
+                <span class="label">Tax</span>
+                <h3>Asset Management</h3>
+                <p>Our primary goal is to protect your capital over the long term while achieving tax-efficient returns.</p>
+                <a href="#" class="learn-more">Know More &rarr;</a>
+            </div>
+    
+            <div class="service-card">
+                <span class="label">Tax</span>
+                <h3>Investment Advisory</h3>
+                <p>Tax-optimized investment strategies for long-term wealth preservation and growth.</p>
+                <a href="#" class="learn-more">Know More &rarr;</a>
+            </div>
+        </div>
+    
+        <!-- Dots Navigation -->
+        <div class="carousel-dots product-dots active">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+        <div class="carousel-dots tax-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+        </div>
+    </section>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabs = document.querySelectorAll('.tab');
+        const containers = document.querySelectorAll('.services-container');
+        const dotsContainers = document.querySelectorAll('.carousel-dots');
+        
+        // Tab Switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.target;
+                
+                // Update tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update containers
+                containers.forEach(c => c.classList.remove('active'));
+                document.querySelector(`.services-container.${target}`).classList.add('active');
+                
+                // Update dots
+                dotsContainers.forEach(d => d.classList.remove('active'));
+                document.querySelector(`.${target}-dots`).classList.add('active');
+            });
+        });
+    
+        // Carousel Functionality
+        function initCarousel(containerClass, dotsClass) {
+            const container = document.querySelector(`.services-container.${containerClass}`);
+            const dots = document.querySelectorAll(`.${dotsClass} .dot`);
+            let touchStartX = 0;
+    
+            // Touch Handling
+            container.addEventListener('touchstart', e => {
+                touchStartX = e.touches[0].clientX;
+            });
+    
+            container.addEventListener('touchend', e => {
+                const touchEndX = e.changedTouches[0].clientX;
+                const delta = touchStartX - touchEndX;
+                const currentIndex = Array.from(dots).findIndex(d => d.classList.contains('active'));
+                
+                if (Math.abs(delta) > 50) {
+                    const newIndex = delta > 0 ? 
+                        Math.min(currentIndex + 1, dots.length - 1) : 
+                        Math.max(currentIndex - 1, 0);
+                    
+                    updateDots(dots, newIndex);
+                    scrollToCard(container, newIndex);
+                }
+            });
+    
+            // Dot Click Handling
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    updateDots(dots, index);
+                    scrollToCard(container, index);
+                });
+            });
+    
+            // Scroll Detection
+            container.addEventListener('scroll', () => {
+                clearTimeout(container.scrollTimer);
+                container.scrollTimer = setTimeout(() => {
+                    const cardWidth = container.children[0].offsetWidth;
+                    const scrollPos = container.scrollLeft;
+                    const activeIndex = Math.round(scrollPos / cardWidth);
+                    updateDots(dots, activeIndex);
+                }, 100);
+            });
+        }
+    
+        function updateDots(dots, activeIndex) {
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === activeIndex);
+            });
+        }
+    
+        function scrollToCard(container, index) {
+            const card = container.children[index];
+            const scrollPos = card.offsetLeft - (container.offsetWidth - card.offsetWidth) / 2;
+            
+            container.scrollTo({
+                left: scrollPos,
+                behavior: 'smooth'
+            });
+        }
+    
+        // Initialize carousels
+        initCarousel('product', 'product-dots');
+        initCarousel('tax', 'tax-dots');
+    });
+    </script>
